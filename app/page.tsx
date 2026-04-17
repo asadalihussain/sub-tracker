@@ -174,7 +174,6 @@ export default function Home() {
         ) : (
           people.map(person => (
             <div className="card" key={person.id}>
-              <button className="btn-delete" onClick={() => deletePerson(person)} title="Remove">✕</button>
               <div className="card-photo-wrap">
                 {person.photo_url
                   ? <Image src={person.photo_url} alt={person.name} width={400} height={400} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
@@ -185,11 +184,6 @@ export default function Home() {
                 <div className="card-name">{person.name}</div>
                 <div className="card-debt-label">Subs owed</div>
                 <div className="card-count-row">
-                  <button
-                    className="btn-minus"
-                    onClick={() => adjust(person, -1)}
-                    disabled={busyIds.has(person.id) || person.count === 0}
-                  >−</button>
                   <div className="count-num">{person.count}</div>
                   <button
                     className="btn-plus"
