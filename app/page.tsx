@@ -145,8 +145,7 @@ export default function Home() {
         <div className="header-brand">
           <div className="logo-mark">🥖</div>
           <div className="brand-text">
-            <h1>Sub Debt Tracker</h1>
-            <p>Post AI slop? You owe the squad a Crave Sub.</p>
+            <h1>Crave Debt Tracker</h1>
           </div>
         </div>
         <div className="total-pill">
@@ -155,7 +154,7 @@ export default function Home() {
       </header>
 
       <div className="hero-strip">
-        <em>Rules:</em> post AI slop or fake news = owe the squad a sub from Crave Subs
+        <em>Rules:</em> post AI slop or fake news = owe third a sub
       </div>
 
       <div className="toolbar">

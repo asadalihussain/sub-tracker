@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Sub Debt Tracker 🥖',
-  description: 'Post AI slop? You owe the squad a Crave Sub.',
+  title: 'Crave Debt Tracker 🥖',
+  description: 'Post AI slop or fake news = owe third a sub.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
