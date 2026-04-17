@@ -1,15 +1,15 @@
 :root {
-  --red:         #c8102e;
-  --red-dark:    #a00d24;
-  --red-light:   #f5e5e8;
-  --yellow:      #f5c518;
-  --cream:       #faf6ef;
-  --brown:       #7f4f24;
-  --brown-light: #c49a6c;
-  --dark:        #1c1208;
+  --red:         #d41b1b;
+  --red-dark:    #aa1010;
+  --red-light:   #fdeaea;
+  --yellow:      #ffd31c;
+  --yellow-dark: #e6bb00;
+  --cream:       #f5f5f5;
+  --brown:       #111111;
+  --dark:        #111111;
   --card-bg:     #ffffff;
-  --border:      #e8ddd0;
-  --text-muted:  #8a7560;
+  --border:      #e0e0e0;
+  --text-muted:  #888888;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,37 +23,44 @@ body {
 
 /* ── HEADER ── */
 header {
-  background: var(--red);
+  background: #111111;
   color: #fff;
   padding: 0 40px;
   display: flex;
   align-items: stretch;
   justify-content: space-between;
   min-height: 80px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,.5);
   position: sticky;
   top: 0;
   z-index: 50;
+  border-bottom: 3px solid var(--yellow);
 }
 
 .header-brand {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 0;
+  padding: 12px 0;
 }
 
 .logo-mark {
-  width: 48px;
-  height: 48px;
+  height: 56px;
+  width: auto;
+  flex-shrink: 0;
+  display: block;
+}
+
+.logo-mark-fallback {
+  height: 56px;
+  width: 56px;
   background: var(--yellow);
-  border-radius: 50%;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
 
 .brand-text h1 {
@@ -63,22 +70,24 @@ header {
   letter-spacing: 1px;
   text-transform: uppercase;
   line-height: 1;
+  color: var(--yellow);
 }
 
 .brand-text p {
   font-size: 0.78rem;
-  opacity: 0.8;
+  opacity: 0.7;
   margin-top: 3px;
+  color: #fff;
 }
 
 .total-pill {
   background: var(--yellow);
-  color: var(--dark);
-  border-radius: 50px;
+  color: #111;
+  border-radius: 6px;
   padding: 8px 20px;
   font-family: 'Oswald', sans-serif;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.5px;
   white-space: nowrap;
   display: flex;
@@ -94,10 +103,10 @@ header {
 
 /* ── HERO STRIP ── */
 .hero-strip {
-  background: var(--dark);
+  background: var(--red);
   color: #fff;
   text-align: center;
-  padding: 12px 20px;
+  padding: 10px 20px;
   font-family: 'Oswald', sans-serif;
   font-size: 0.9rem;
   letter-spacing: 2px;
@@ -125,7 +134,7 @@ header {
   font-family: 'Oswald', sans-serif;
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--brown);
+  color: var(--dark);
   text-transform: uppercase;
   letter-spacing: 1px;
 }

@@ -143,7 +143,7 @@ export default function Home() {
     <>
       <header>
         <div className="header-brand">
-          <div className="logo-mark">🥖</div>
+          <img src="/crave-logo.png" alt="Crave Subs" className="logo-mark" onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
           <div className="brand-text">
             <h1>Crave Debt Tracker</h1>
           </div>
