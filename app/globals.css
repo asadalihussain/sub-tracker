@@ -565,4 +565,80 @@ header {
   .toolbar, .grid { padding-left: 16px; padding-right: 16px; }
   .modal { padding: 22px 18px; }
   .brand-text h1 { font-size: 1.3rem; }
+
+  /* ── MOBILE CARD: horizontal layout ── */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  /* remove top red bar, add left bar instead */
+  .card::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--red);
+    border-bottom: none;
+    border-right: 3px solid var(--black);
+  }
+
+  .card-photo-wrap {
+    width: 90px;
+    min-width: 90px;
+    aspect-ratio: 1;
+    border-bottom: none;
+    border-right: 3px solid var(--black);
+    flex-shrink: 0;
+    margin-left: 6px; /* offset for the left bar */
+  }
+
+  .card-initials {
+    font-size: 2.2rem;
+  }
+
+  .card-body {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .card-name {
+    text-align: left;
+    font-size: 1rem;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-debt-label {
+    display: none;
+  }
+
+  .card-count-row {
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .count-num {
+    font-size: 2.2rem;
+    min-width: 40px;
+  }
+
+  .btn-plus {
+    width: 40px;
+    height: 40px;
+    font-size: 1.3rem;
+  }
 }
