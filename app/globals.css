@@ -215,6 +215,34 @@ header {
   object-fit: cover;
 }
 
+.card-photo-clickable {
+  cursor: pointer;
+  position: relative;
+}
+
+.photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.card-photo-clickable:hover .photo-overlay { opacity: 1; }
+
+.photo-uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
 .card-initials {
   font-family: 'Oswald', sans-serif;
   font-size: 4rem;

@@ -79,10 +79,13 @@ export default function Home() {
   const [saving, setSaving]       = useState(false);
   const [toast, setToast]         = useState('');
   const [toastVisible, setToastVisible] = useState(false);
-  const [busyIds, setBusyIds]     = useState<Set<string>>(new Set());
-  const toastTimer = useRef<ReturnType<typeof setTimeout>>();
+  const [busyIds, setBusyIds]         = useState<Set<string>>(new Set());
+  const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
+  const toastTimer   = useRef<ReturnType<typeof setTimeout>>();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const photoTargetId = useRef<string | null>(null);
 
   // ── GATE ──
   useEffect(() => {
@@ -148,6 +151,39 @@ export default function Home() {
     if (!confirm(`Remove ${person.name} from the wall of shame?`)) return;
     setPeople(prev => prev.filter(p => p.id !== person.id));
     await fetch(`/api/people/${person.id}`, { method: 'DELETE' });
+  }
+
+  // ── PHOTO UPDATE ──
+  function triggerPhotoUpload(personId: string) {
+    photoTargetId.current = personId;
+    if (photoInputRef.current) {
+      photoInputRef.current.value = '';
+      photoInputRef.current.click();
+    }
+  }
+
+  async function onPhotoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const id = photoTargetId.current;
+    if (!file || !id) return;
+
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      const dataUrl = ev.target?.result as string;
+      setUploadingIds(prev => new Set(prev).add(id));
+      const res = await fetch(`/api/people/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoDataUrl: dataUrl }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setPeople(prev => prev.map(p => p.id === id ? { ...p, photo_url: updated.photo_url } : p));
+        showToast('Photo updated! 📸');
+      }
+      setUploadingIds(prev => { const s = new Set(prev); s.delete(id); return s; });
+    };
+    reader.readAsDataURL(file);
   }
 
   // ── MODAL ──
@@ -241,11 +277,18 @@ export default function Home() {
         ) : (
           people.map(person => (
             <div className="card" key={person.id}>
-              <div className="card-photo-wrap">
-                {person.photo_url
-                  ? <Image src={person.photo_url} alt={person.name} width={400} height={400} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                  : <div className="card-initials">{initials(person.name)}</div>
+              <div
+                className="card-photo-wrap card-photo-clickable"
+                onClick={() => triggerPhotoUpload(person.id)}
+                title="Click to update photo"
+              >
+                {uploadingIds.has(person.id)
+                  ? <div className="photo-uploading"><div className="spinner" /></div>
+                  : person.photo_url
+                    ? <Image src={person.photo_url} alt={person.name} width={400} height={400} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                    : <div className="card-initials">{initials(person.name)}</div>
                 }
+                <div className="photo-overlay">📷</div>
               </div>
               <div className="card-body">
                 <div className="card-name">{person.name}</div>
@@ -314,6 +357,15 @@ export default function Home() {
       </div>
 
       <div className={`toast${toastVisible ? ' show' : ''}`}>{toast}</div>
+
+      {/* Hidden file input for photo updates */}
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={onPhotoFileChange}
+      />
     </>
   );
 }
