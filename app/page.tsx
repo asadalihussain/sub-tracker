@@ -183,7 +183,7 @@ export default function Home() {
               </div>
               <div className="card-body">
                 <div className="card-name">{person.name}</div>
-                <div className="card-debt-label">Subs owed to the squad</div>
+                <div className="card-debt-label">Subs owed</div>
                 <div className="card-count-row">
                   <button
                     className="btn-minus"
