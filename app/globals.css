@@ -1,15 +1,17 @@
 :root {
-  --red:         #d41b1b;
-  --red-dark:    #aa1010;
+  --red:         #ec1922;
+  --red-dark:    #c4141b;
   --red-light:   #fdeaea;
-  --yellow:      #ffd31c;
-  --yellow-dark: #e6bb00;
-  --cream:       #f5f5f5;
-  --brown:       #111111;
-  --dark:        #111111;
+  --yellow:      #f3da03;
+  --yellow-dark: #d4be00;
+  --blue:        #39b5ff;
+  --blue-dark:   #1a9ee8;
+  --blue-light:  #e6f6ff;
+  --cream:       #f4f6f9;
+  --dark:        #0f1923;
   --card-bg:     #ffffff;
-  --border:      #e0e0e0;
-  --text-muted:  #888888;
+  --border:      #dde3ea;
+  --text-muted:  #7a8899;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,11 +21,12 @@ body {
   background: var(--cream);
   color: var(--dark);
   min-height: 100vh;
+  background-image: none;
 }
 
 /* ── HEADER ── */
 header {
-  background: #111111;
+  background: var(--dark);
   color: #fff;
   padding: 0 40px;
   display: flex;
@@ -34,7 +37,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 3px solid var(--yellow);
+  border-bottom: 3px solid var(--blue);
 }
 
 .header-brand {
@@ -70,7 +73,7 @@ header {
   letter-spacing: 1px;
   text-transform: uppercase;
   line-height: 1;
-  color: var(--yellow);
+  color: var(--blue);
 }
 
 .brand-text p {
@@ -82,7 +85,7 @@ header {
 
 .total-pill {
   background: var(--yellow);
-  color: #111;
+  color: var(--dark);
   border-radius: 6px;
   padding: 8px 20px;
   font-family: 'Oswald', sans-serif;
@@ -116,6 +119,7 @@ header {
 .hero-strip em {
   color: var(--yellow);
   font-style: normal;
+  font-weight: 700;
 }
 
 /* ── TOOLBAR ── */
@@ -186,13 +190,13 @@ header {
 }
 
 .card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,.14); }
-.card::before { content: ''; display: block; height: 4px; background: var(--red); }
+.card::before { content: ''; display: block; height: 4px; background: linear-gradient(to right, var(--red), var(--blue)); }
 
 .card-photo-wrap {
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  background: var(--red-light);
+  background: var(--blue-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,7 +212,7 @@ header {
   font-family: 'Oswald', sans-serif;
   font-size: 3.5rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--blue);
 }
 
 .card-body {
@@ -251,7 +255,7 @@ header {
   font-family: 'Oswald', sans-serif;
   font-size: 3rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--blue);
   min-width: 56px;
   text-align: center;
   line-height: 1;
@@ -263,9 +267,9 @@ header {
 }
 
 @keyframes bump {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.25); }
-  100% { transform: scale(1); }
+  0%   { transform: scale(1); color: var(--blue); }
+  40%  { transform: scale(1.25); color: var(--yellow); }
+  100% { transform: scale(1); color: var(--blue); }
 }
 
 .btn-plus {
@@ -282,7 +286,7 @@ header {
   align-items: center;
   justify-content: center;
   transition: background 0.15s, transform 0.1s;
-  box-shadow: 0 3px 10px rgba(200,16,46,.4);
+  box-shadow: 0 3px 10px rgba(236,25,34,.4);
   flex-shrink: 0;
 }
 
@@ -346,7 +350,7 @@ header {
   font-family: 'Oswald', sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--brown);
+  color: var(--blue);
   margin-top: 16px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -409,7 +413,7 @@ header {
   font-family: 'Oswald', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--blue);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -439,7 +443,7 @@ header {
   color: var(--dark);
 }
 
-.field input[type="text"]:focus { border-color: var(--red); }
+.field input[type="text"]:focus { border-color: var(--blue); }
 .field input[type="text"].error { border-color: var(--red); }
 
 .photo-upload-area {
@@ -452,7 +456,7 @@ header {
   background: var(--cream);
 }
 
-.photo-upload-area:hover { border-color: var(--red); background: var(--red-light); }
+.photo-upload-area:hover { border-color: var(--blue); background: var(--blue-light); }
 
 .photo-preview-img {
   width: 90px;
@@ -461,7 +465,7 @@ header {
   object-fit: cover;
   margin: 0 auto 10px;
   display: none;
-  border: 3px solid var(--red);
+  border: 3px solid var(--blue);
 }
 
 .photo-preview-img.visible { display: block; }
