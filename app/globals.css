@@ -560,6 +560,103 @@ header {
 
 .toast.show { transform: translateX(-50%) translateY(0); }
 
+/* ── GATE ── */
+.gate-overlay {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gate-card {
+  background: var(--white);
+  border: 3px solid var(--black);
+  border-radius: 10px;
+  box-shadow: 8px 8px 0 var(--black);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.gate-emoji { font-size: 3.5rem; }
+
+.gate-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--black);
+}
+
+.gate-question {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--black);
+  background: var(--yellow);
+  border: 3px solid var(--black);
+  border-radius: 6px;
+  padding: 10px 20px;
+  width: 100%;
+  letter-spacing: 0.5px;
+  box-shadow: 3px 3px 0 var(--black);
+}
+
+.gate-input {
+  width: 100%;
+  border: 3px solid var(--black);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  box-shadow: 3px 3px 0 var(--black);
+  text-align: center;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.gate-input:focus {
+  border-color: var(--blue);
+  box-shadow: 3px 3px 0 var(--blue);
+}
+
+.gate-btn {
+  background: var(--red);
+  color: var(--white);
+  border: 3px solid var(--black);
+  border-radius: 6px;
+  padding: 12px 40px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--black);
+  transition: transform 0.1s, box-shadow 0.1s;
+  width: 100%;
+}
+
+.gate-btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--black); }
+.gate-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--black); }
+
+@keyframes gate-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
+.gate-shake { animation: gate-shake 0.5s ease; }
+
 @media (max-width: 600px) {
   header { padding: 0 18px; min-height: 70px; }
   .toolbar, .grid { padding-left: 16px; padding-right: 16px; }

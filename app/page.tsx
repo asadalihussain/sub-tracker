@@ -3,6 +3,59 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 
+function checkAnswer(raw: string): boolean {
+  const s = raw.trim().toLowerCase().replace(/\s+/g, ' ');
+  const accepted = [
+    'third', '3rd',
+    'third street', '3rd street',
+    'third st', '3rd st',
+    'thirdstreet', '3rdstreet',
+    'third st.', '3rd st.',
+  ];
+  return accepted.includes(s);
+}
+
+function Gate({ onPass }: { onPass: () => void }) {
+  const [answer, setAnswer] = useState('');
+  const [shake, setShake]   = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  function submit() {
+    if (checkAnswer(answer)) {
+      onPass();
+    } else {
+      setShake(true);
+      setAnswer('');
+      setTimeout(() => setShake(false), 600);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }
+
+  return (
+    <div className="gate-overlay">
+      <div className={`gate-card${shake ? ' gate-shake' : ''}`}>
+        <div className="gate-emoji">🥖</div>
+        <h2 className="gate-title">Members Only</h2>
+        <p className="gate-question">What&apos;s your favorite street?</p>
+        <input
+          ref={inputRef}
+          className="gate-input"
+          type="text"
+          value={answer}
+          onChange={e => setAnswer(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && submit()}
+          placeholder="Type your answer..."
+          maxLength={40}
+          autoComplete="off"
+        />
+        <button className="gate-btn" onClick={submit}>Enter</button>
+      </div>
+    </div>
+  );
+}
+
 interface Person {
   id: string;
   name: string;
@@ -16,6 +69,7 @@ function initials(name: string) {
 }
 
 export default function Home() {
+  const [unlocked, setUnlocked]   = useState<boolean | null>(null);
   const [people, setPeople]       = useState<Person[]>([]);
   const [loading, setLoading]     = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,6 +83,16 @@ export default function Home() {
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── GATE ──
+  useEffect(() => {
+    setUnlocked(localStorage.getItem('crave-access') === '1');
+  }, []);
+
+  function handlePass() {
+    localStorage.setItem('crave-access', '1');
+    setUnlocked(true);
+  }
 
   // ── FETCH ──
   const fetchPeople = useCallback(async () => {
@@ -138,6 +202,9 @@ export default function Home() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   });
+
+  if (unlocked === null) return null; // wait for localStorage check
+  if (!unlocked) return <Gate onPass={handlePass} />;
 
   return (
     <>
