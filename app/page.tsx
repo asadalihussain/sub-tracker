@@ -125,7 +125,11 @@ export default function Home() {
   }, [fetchAll]);
 
   const total = people.reduce((s, p) => s + p.count, 0);
-  const sorted = [...people].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  const sorted = [...people].sort((a, b) => {
+    const aPending = pendingVotes.some(v => v.person_id === a.id) ? 1 : 0;
+    const bPending = pendingVotes.some(v => v.person_id === b.id) ? 1 : 0;
+    return bPending - aPending || b.count - a.count || a.name.localeCompare(b.name);
+  });
 
   function pendingFor(personId: string) {
     return pendingVotes.filter(v => v.person_id === personId);
