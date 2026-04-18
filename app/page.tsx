@@ -325,24 +325,23 @@ export default function Home() {
                       title="Start a vote to add a sub"
                     >＋</button>
                   </div>
-                  {pending.length > 0 && (
-                    <div
-                      className="pending-badge"
-                      onClick={() => { window.location.href = `/vote/${pending[0].id}`; }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      🗳️ vote pending
-                      {pending.map(v => {
-                        const net = v.yes_count - v.no_count;
-                        return (
-                          <span key={v.id} className="pending-net">
-                            {net >= 0 ? '+' : ''}{net}/3
-                          </span>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
+                {pending.length > 0 && (
+                  <div
+                    className="pending-badge"
+                    onClick={() => { window.location.href = `/vote/${pending[0].id}`; }}
+                  >
+                    🗳️ vote pending
+                    {pending.map(v => {
+                      const net = v.yes_count - v.no_count;
+                      return (
+                        <span key={v.id} className="pending-net">
+                          {net >= 0 ? '+' : ''}{net}/3
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })

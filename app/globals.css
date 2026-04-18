@@ -596,14 +596,14 @@ header {
   gap: 6px;
   flex-wrap: wrap;
   background: #fff8d6;
-  border: 2px solid var(--yellow);
-  border-radius: 6px;
-  padding: 5px 10px;
+  border-top: 2px solid var(--yellow);
+  padding: 7px 14px;
   font-family: 'Inter', sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
   color: #7a6000;
-  box-shadow: 2px 2px 0 var(--black);
+  cursor: pointer;
+  width: 100%;
 }
 
 .pending-net {
@@ -732,7 +732,7 @@ header {
   .modal { padding: 22px 18px; }
   .brand-text h1 { font-size: 1.3rem; }
 
-  /* ── MOBILE CARD: horizontal layout ── */
+  /* ── MOBILE CARD: photo left, name+count right, pending full-width below ── */
   .grid {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -740,10 +740,10 @@ header {
 
   .card {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: stretch;
   }
 
-  /* remove top red bar, add left bar instead */
   .card::before {
     content: '';
     display: block;
@@ -757,13 +757,13 @@ header {
   }
 
   .card-photo-wrap {
-    width: 90px;
-    min-width: 90px;
+    width: 88px;
+    min-width: 88px;
     aspect-ratio: 1;
     border-bottom: none;
     border-right: 3px solid var(--black);
     flex-shrink: 0;
-    margin-left: 6px; /* offset for the left bar */
+    margin-left: 6px;
   }
 
   .card-initials {
@@ -772,20 +772,21 @@ header {
 
   .card-body {
     flex: 1;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     padding: 10px 14px;
-    gap: 10px;
+    gap: 6px;
   }
 
   .card-name {
     text-align: left;
     font-size: 1rem;
-    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%;
   }
 
   .card-debt-label {
@@ -795,16 +796,25 @@ header {
   .card-count-row {
     flex-shrink: 0;
     gap: 8px;
+    justify-content: flex-start;
   }
 
   .count-num {
-    font-size: 2.2rem;
-    min-width: 40px;
+    font-size: 2rem;
+    min-width: 36px;
   }
 
   .btn-plus {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     font-size: 1.3rem;
+  }
+
+  /* pending badge: flex-basis 100% pushes it to its own full-width row */
+  .pending-badge {
+    flex-basis: 100%;
+    border-top: 2px solid var(--yellow);
+    border-radius: 0 0 6px 6px;
+    justify-content: center;
   }
 }
