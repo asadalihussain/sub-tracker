@@ -125,6 +125,7 @@ export default function Home() {
   }, [fetchAll]);
 
   const total = people.reduce((s, p) => s + p.count, 0);
+  const sorted = [...people].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
   function pendingFor(personId: string) {
     return pendingVotes.filter(v => v.person_id === personId);
@@ -296,7 +297,7 @@ export default function Home() {
             <p>Add someone to start tracking their sub debt.</p>
           </div>
         ) : (
-          people.map(person => {
+          sorted.map(person => {
             const pending = pendingFor(person.id);
             return (
               <div className="card" key={person.id}>
