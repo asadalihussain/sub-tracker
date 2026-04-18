@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 interface Vote {
@@ -23,6 +23,15 @@ export default function VotePage({ params }: { params: { id: string } }) {
   const [casting, setCasting] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 2000);
+  }
 
   const storageKey = `voted-${params.id}`;
 
@@ -235,7 +244,29 @@ export default function VotePage({ params }: { params: { id: string } }) {
         )}
       </div>
 
-      <p style={{ marginTop: '20px', color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem', fontFamily: 'Inter', letterSpacing: '1px', textTransform: 'uppercase' }}>
+      <button
+        onClick={copyLink}
+        style={{
+          marginTop: '20px',
+          background: copied ? '#f3da03' : '#111',
+          color: copied ? '#111' : '#fff',
+          border: '3px solid #111',
+          borderRadius: '6px',
+          padding: '10px 28px',
+          fontFamily: "'Oswald', sans-serif",
+          fontSize: '0.95rem',
+          fontWeight: 700,
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          boxShadow: '4px 4px 0 #111',
+          transition: 'background 0.15s, color 0.15s',
+        }}
+      >
+        {copied ? '✓ Copied!' : '📋 Copy Vote Link'}
+      </button>
+
+      <p style={{ marginTop: '12px', color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem', fontFamily: 'Inter', letterSpacing: '1px', textTransform: 'uppercase' }}>
         Crave Debt Tracker
       </p>
     </div>
