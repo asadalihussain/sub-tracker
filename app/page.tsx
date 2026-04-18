@@ -64,26 +64,36 @@ interface Person {
   created_at: string;
 }
 
+interface PendingVote {
+  id: string;
+  person_id: string;
+  yes_count: number;
+  no_count: number;
+}
+
 function initials(name: string) {
   return name.trim().split(/\s+/).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
 }
 
 export default function Home() {
-  const [unlocked, setUnlocked]   = useState<boolean | null>(null);
-  const [people, setPeople]       = useState<Person[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [name, setName]           = useState('');
-  const [nameError, setNameError] = useState(false);
+  const [unlocked, setUnlocked]     = useState<boolean | null>(null);
+  const [people, setPeople]         = useState<Person[]>([]);
+  const [pendingVotes, setPendingVotes] = useState<PendingVote[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [shareVote, setShareVote]   = useState<{ id: string; name: string } | null>(null);
+  const [copied, setCopied]         = useState(false);
+  const [name, setName]             = useState('');
+  const [nameError, setNameError]   = useState(false);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
-  const [saving, setSaving]       = useState(false);
-  const [toast, setToast]         = useState('');
+  const [saving, setSaving]         = useState(false);
+  const [toast, setToast]           = useState('');
   const [toastVisible, setToastVisible] = useState(false);
-  const [busyIds, setBusyIds]         = useState<Set<string>>(new Set());
+  const [busyIds, setBusyIds]       = useState<Set<string>>(new Set());
   const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
-  const toastTimer   = useRef<ReturnType<typeof setTimeout>>();
-  const nameInputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const toastTimer    = useRef<ReturnType<typeof setTimeout>>();
+  const nameInputRef  = useRef<HTMLInputElement>(null);
+  const fileInputRef  = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const photoTargetId = useRef<string | null>(null);
 
@@ -98,59 +108,60 @@ export default function Home() {
   }
 
   // ── FETCH ──
-  const fetchPeople = useCallback(async () => {
-    const res = await fetch('/api/people');
-    if (res.ok) setPeople(await res.json());
+  const fetchAll = useCallback(async () => {
+    const [peopleRes, votesRes] = await Promise.all([
+      fetch('/api/people'),
+      fetch('/api/votes'),
+    ]);
+    if (peopleRes.ok) setPeople(await peopleRes.json());
+    if (votesRes.ok)  setPendingVotes(await votesRes.json());
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchPeople();
-    const interval = setInterval(fetchPeople, 4000);
+    fetchAll();
+    const interval = setInterval(fetchAll, 4000);
     return () => clearInterval(interval);
-  }, [fetchPeople]);
+  }, [fetchAll]);
 
   const total = people.reduce((s, p) => s + p.count, 0);
+
+  function pendingFor(personId: string) {
+    return pendingVotes.filter(v => v.person_id === personId);
+  }
 
   // ── TOAST ──
   function showToast(msg: string) {
     setToast(msg);
     setToastVisible(true);
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToastVisible(false), 2400);
+    toastTimer.current = setTimeout(() => setToastVisible(false), 2800);
   }
 
-  // ── ADJUST COUNT ──
-  async function adjust(person: Person, delta: number) {
+  // ── CREATE VOTE ──
+  async function createVote(person: Person) {
     if (busyIds.has(person.id)) return;
     setBusyIds(prev => new Set(prev).add(person.id));
-
-    // Optimistic update
-    setPeople(prev =>
-      prev.map(p => p.id === person.id
-        ? { ...p, count: Math.max(0, p.count + delta) }
-        : p
-      )
-    );
-
-    await fetch(`/api/people/${person.id}`, {
-      method: 'PATCH',
+    const res = await fetch('/api/votes', {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ delta }),
+      body: JSON.stringify({ personId: person.id }),
     });
-
-    if (delta > 0) showToast(`${person.name} owes another sub! 🥖`);
-
+    if (res.ok) {
+      const vote = await res.json();
+      setShareVote({ id: vote.id, name: person.name });
+      setCopied(false);
+      fetchAll();
+    }
     setBusyIds(prev => { const s = new Set(prev); s.delete(person.id); return s; });
-    // Sync to get authoritative value
-    fetchPeople();
   }
 
-  // ── DELETE ──
-  async function deletePerson(person: Person) {
-    if (!confirm(`Remove ${person.name} from the wall of shame?`)) return;
-    setPeople(prev => prev.filter(p => p.id !== person.id));
-    await fetch(`/api/people/${person.id}`, { method: 'DELETE' });
+  // ── RESET ──
+  async function resetAll() {
+    if (!confirm('Reset ALL sub counts to 0? This cannot be undone.')) return;
+    await fetch('/api/reset', { method: 'POST' });
+    fetchAll();
+    showToast('All counts reset to 0 🔄');
   }
 
   // ── PHOTO UPDATE ──
@@ -166,7 +177,6 @@ export default function Home() {
     const file = e.target.files?.[0];
     const id = photoTargetId.current;
     if (!file || !id) return;
-
     const reader = new FileReader();
     reader.onload = async ev => {
       const dataUrl = ev.target?.result as string;
@@ -186,19 +196,14 @@ export default function Home() {
     reader.readAsDataURL(file);
   }
 
-  // ── MODAL ──
+  // ── ADD PERSON MODAL ──
   function openModal() {
-    setName('');
-    setNameError(false);
-    setPhotoDataUrl(null);
+    setName(''); setNameError(false); setPhotoDataUrl(null);
     setModalOpen(true);
     setTimeout(() => nameInputRef.current?.focus(), 60);
   }
 
-  function closeModal() {
-    if (saving) return;
-    setModalOpen(false);
-  }
+  function closeModal() { if (saving) return; setModalOpen(false); }
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -232,20 +237,29 @@ export default function Home() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); setShareVote(null); }
       if (e.key === 'Enter' && modalOpen) savePerson();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  if (unlocked === null) return null; // wait for localStorage check
+  function copyShareLink() {
+    if (!shareVote) return;
+    const url = `${window.location.origin}/vote/${shareVote.id}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (unlocked === null) return null;
   if (!unlocked) return <Gate onPass={handlePass} />;
 
   return (
     <>
       <header>
         <div className="header-brand">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/crave-logo.png" alt="Crave Subs" className="logo-mark" onError={e => { (e.target as HTMLImageElement).style.display='none'; }} />
           <div className="brand-text">
             <h1>Crave Debt Tracker</h1>
@@ -275,39 +289,80 @@ export default function Home() {
             <p>Add someone to start tracking their sub debt.</p>
           </div>
         ) : (
-          people.map(person => (
-            <div className="card" key={person.id}>
-              <div
-                className="card-photo-wrap card-photo-clickable"
-                onClick={() => triggerPhotoUpload(person.id)}
-                title="Click to update photo"
-              >
-                {uploadingIds.has(person.id)
-                  ? <div className="photo-uploading"><div className="spinner" /></div>
-                  : person.photo_url
-                    ? <Image src={person.photo_url} alt={person.name} width={400} height={400} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                    : <div className="card-initials">{initials(person.name)}</div>
-                }
-                <div className="photo-overlay">📷</div>
-              </div>
-              <div className="card-body">
-                <div className="card-name">{person.name}</div>
-                <div className="card-debt-label">Subs owed</div>
-                <div className="card-count-row">
-                  <div className="count-num">{person.count}</div>
-                  <button
-                    className="btn-plus"
-                    onClick={() => adjust(person, +1)}
-                    disabled={busyIds.has(person.id)}
-                  >＋</button>
+          people.map(person => {
+            const pending = pendingFor(person.id);
+            return (
+              <div className="card" key={person.id}>
+                <div
+                  className="card-photo-wrap card-photo-clickable"
+                  onClick={() => triggerPhotoUpload(person.id)}
+                  title="Click to update photo"
+                >
+                  {uploadingIds.has(person.id)
+                    ? <div className="photo-uploading"><div className="spinner" /></div>
+                    : person.photo_url
+                      ? <Image src={person.photo_url} alt={person.name} width={400} height={400} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                      : <div className="card-initials">{initials(person.name)}</div>
+                  }
+                  <div className="photo-overlay">📷</div>
+                </div>
+                <div className="card-body">
+                  <div className="card-name">{person.name}</div>
+                  <div className="card-debt-label">Subs owed</div>
+                  <div className="card-count-row">
+                    <div className="count-num">{person.count}</div>
+                    <button
+                      className="btn-plus"
+                      onClick={() => createVote(person)}
+                      disabled={busyIds.has(person.id)}
+                      title="Start a vote to add a sub"
+                    >＋</button>
+                  </div>
+                  {pending.length > 0 && (
+                    <div className="pending-badge">
+                      🗳️ {pending.length} vote{pending.length > 1 ? 's' : ''} pending
+                      {pending.map(v => {
+                        const net = v.yes_count - v.no_count;
+                        return (
+                          <span key={v.id} className="pending-net" title="Current net votes">
+                            {net >= 0 ? '+' : ''}{net}/3
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
-      {/* Modal */}
+      {/* Share modal */}
+      {shareVote && (
+        <div className="modal-overlay open" onClick={e => { if (e.target === e.currentTarget) setShareVote(null); }}>
+          <div className="modal">
+            <div className="modal-header">
+              <span style={{ fontSize: '1.6rem' }}>🗳️</span>
+              <h2>Vote created!</h2>
+            </div>
+            <p style={{ fontFamily: 'Inter', fontSize: '0.95rem', color: '#444', lineHeight: 1.5 }}>
+              Share this link in the group chat. 3 thumbs up = sub confirmed. 3 thumbs down = no sub.
+            </p>
+            <div className="share-link-box">
+              {typeof window !== 'undefined' ? `${window.location.origin}/vote/${shareVote.id}` : ''}
+            </div>
+            <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={copyShareLink}>
+              {copied ? '✓ Copied!' : '📋 Copy Link'}
+            </button>
+            <button className="btn-cancel" style={{ width: '100%', textAlign: 'center', justifyContent: 'center' }} onClick={() => setShareVote(null)}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add person modal */}
       <div
         className={`modal-overlay${modalOpen ? ' open' : ''}`}
         onClick={e => { if (e.target === e.currentTarget) closeModal(); }}
@@ -336,10 +391,7 @@ export default function Home() {
             <label>Photo <span style={{ color: '#aaa', fontWeight: 400, textTransform: 'none' }}>(optional)</span></label>
             <div className="photo-upload-area" onClick={() => fileInputRef.current?.click()}>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={onFileChange} style={{ display: 'none' }} />
-              {photoDataUrl
-                ? <img src={photoDataUrl} alt="Preview" className="photo-preview-img visible" />
-                : null
-              }
+              {photoDataUrl ? <img src={photoDataUrl} alt="Preview" className="photo-preview-img visible" /> : null}
               <div style={{ display: photoDataUrl ? 'none' : 'block' }}>
                 <div className="upload-icon">📷</div>
                 <div className="upload-hint">Click to upload a photo</div>
@@ -358,14 +410,7 @@ export default function Home() {
 
       <div className={`toast${toastVisible ? ' show' : ''}`}>{toast}</div>
 
-      {/* Hidden file input for photo updates */}
-      <input
-        ref={photoInputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={onPhotoFileChange}
-      />
+      <input ref={photoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={onPhotoFileChange} />
     </>
   );
 }

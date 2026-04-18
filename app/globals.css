@@ -588,6 +588,47 @@ header {
 
 .toast.show { transform: translateX(-50%) translateY(0); }
 
+/* ── PENDING BADGE ── */
+.pending-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: #fff8d6;
+  border: 2px solid var(--yellow);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7a6000;
+  box-shadow: 2px 2px 0 var(--black);
+}
+
+.pending-net {
+  background: var(--yellow);
+  color: var(--black);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  border: 1.5px solid var(--black);
+}
+
+/* ── SHARE LINK ── */
+.share-link-box {
+  background: #f5f5f5;
+  border: 2px solid var(--black);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: #333;
+  word-break: break-all;
+  box-shadow: 3px 3px 0 var(--black);
+}
+
 /* ── GATE ── */
 .gate-overlay {
   min-height: 100vh;
