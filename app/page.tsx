@@ -140,11 +140,10 @@ export default function Home() {
 
   // ── CREATE VOTE ──
   async function createVote(person: Person) {
-    // If pending vote already exists, just show its share link
+    // If pending vote already exists, go straight to the vote page
     const existing = pendingVotes.find(v => v.person_id === person.id);
     if (existing) {
-      setShareVote({ id: existing.id, name: person.name });
-      setCopied(false);
+      window.location.href = `/vote/${existing.id}`;
       return;
     }
 
@@ -327,12 +326,16 @@ export default function Home() {
                     >＋</button>
                   </div>
                   {pending.length > 0 && (
-                    <div className="pending-badge">
-                      🗳️ {pending.length} vote{pending.length > 1 ? 's' : ''} pending
+                    <div
+                      className="pending-badge"
+                      onClick={() => { window.location.href = `/vote/${pending[0].id}`; }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      🗳️ vote pending
                       {pending.map(v => {
                         const net = v.yes_count - v.no_count;
                         return (
-                          <span key={v.id} className="pending-net" title="Current net votes">
+                          <span key={v.id} className="pending-net">
                             {net >= 0 ? '+' : ''}{net}/3
                           </span>
                         );
