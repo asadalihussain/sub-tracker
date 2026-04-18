@@ -140,6 +140,14 @@ export default function Home() {
 
   // ── CREATE VOTE ──
   async function createVote(person: Person) {
+    // If pending vote already exists, just show its share link
+    const existing = pendingVotes.find(v => v.person_id === person.id);
+    if (existing) {
+      setShareVote({ id: existing.id, name: person.name });
+      setCopied(false);
+      return;
+    }
+
     if (busyIds.has(person.id)) return;
     setBusyIds(prev => new Set(prev).add(person.id));
     const res = await fetch('/api/votes', {

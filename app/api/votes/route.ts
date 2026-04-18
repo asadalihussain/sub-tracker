@@ -33,6 +33,14 @@ export async function POST(req: NextRequest) {
   const { rows: people } = await sql`SELECT * FROM people WHERE id = ${personId}`;
   if (!people.length) return NextResponse.json({ error: 'Person not found' }, { status: 404 });
 
+  // Return existing pending vote if one exists
+  const { rows: existing } = await sql`
+    SELECT * FROM votes WHERE person_id = ${personId} AND status = 'pending' LIMIT 1
+  `;
+  if (existing.length) {
+    return NextResponse.json({ ...existing[0], person_name: people[0].name, existed: true });
+  }
+
   const { rows } = await sql`
     INSERT INTO votes (person_id) VALUES (${personId}) RETURNING *
   `;
